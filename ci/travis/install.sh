@@ -45,7 +45,7 @@ git submodule update -q --init tools/build
 mkdir -p libs/$SELF
 mkdir -p boost/$SELF
 cp -r $TRAVIS_BUILD_DIR/* libs/$SELF
-cp -r $TRAVIS_BUILD_DIR/include/* boost/$SELF
+cp -r $TRAVIS_BUILD_DIR/include/boost/astronomy/* boost/$SELF
 export BOOST_ROOT="`pwd`"
 export PATH="`pwd`":$PATH
 python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools $DEPINST $SELF
