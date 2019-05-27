@@ -27,6 +27,10 @@ cd boost-root
 
 # List all (recursive) dependencies explicitly to control any new additions
 # Direct (of GIL headers only)
+git submodule update -q --init libs/headers
+git submodule update -q --init tools/boost_install
+git submodule update -q --init tools/boostdep
+git submodule update -q --init tools/build
 # git submodule --quiet update --init $GIT_SUBMODULE_OPTS \
 #     tools/build \
 #     tools/boost_install \
