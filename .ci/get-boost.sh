@@ -27,67 +27,67 @@ cd boost-root
 
 # List all (recursive) dependencies explicitly to control any new additions
 # Direct (of GIL headers only)
-git submodule update -q --init libs/headers
-git submodule update -q --init tools/boost_install
-git submodule update -q --init tools/boostdep
-git submodule update -q --init tools/build
-# git submodule --quiet update --init $GIT_SUBMODULE_OPTS \
-#     tools/build \
-#     tools/boost_install \
-#     tools/boostdep \
-#     libs/headers \
-#     libs/algorithm \
-#     libs/array \
-#     libs/assert \
-#     libs/concept_check \
-#     libs/config \
-#     libs/core \
-#     libs/crc \
-#     libs/filesystem \
-#     libs/integer \
-#     libs/iterator \
-#     libs/mp11 \
-#     libs/mpl \
-#     libs/numeric/conversion \
-#     libs/preprocessor \
-#     libs/test \
-#     libs/type_traits \
-#     libs/variant
-# # Transitive (of GIL tests too)
-# git submodule --quiet update --init $GIT_SUBMODULE_OPTS \
-#     libs/atomic \
-#     libs/bind \
-#     libs/chrono \
-#     libs/container \
-#     libs/container_hash \
-#     libs/conversion \
-#     libs/detail \
-#     libs/exception \
-#     libs/function \
-#     libs/function_types \
-#     libs/fusion \
-#     libs/intrusive \
-#     libs/io \
-#     libs/lambda \
-#     libs/math \
-#     libs/move \
-#     libs/optional \
-#     libs/predef \
-#     libs/range \
-#     libs/ratio \
-#     libs/rational \
-#     libs/regex \
-#     libs/static_assert \
-#     libs/smart_ptr \
-#     libs/system \
-#     libs/throw_exception \
-#     libs/timer \
-#     libs/tuple \
-#     libs/type_index \
-#     libs/typeof \
-#     libs/unordered \
-#     libs/utility \
-#     libs/winapi
+# git submodule update -q --init libs/headers
+# git submodule update -q --init tools/boost_install
+# git submodule update -q --init tools/boostdep
+# git submodule update -q --init tools/build
+git submodule --quiet update --init $GIT_SUBMODULE_OPTS \
+    tools/build \
+    tools/boost_install \
+    tools/boostdep \
+    libs/headers \
+    libs/algorithm \
+    libs/array \
+    libs/assert \
+    libs/concept_check \
+    libs/config \
+    libs/core \
+    libs/crc \
+    libs/filesystem \
+    libs/integer \
+    libs/iterator \
+    libs/mp11 \
+    libs/mpl \
+    libs/numeric/conversion \
+    libs/preprocessor \
+    libs/test \
+    libs/type_traits \
+    libs/variant
+# Transitive (of GIL tests too)
+git submodule --quiet update --init $GIT_SUBMODULE_OPTS \
+    libs/atomic \
+    libs/bind \
+    libs/chrono \
+    libs/container \
+    libs/container_hash \
+    libs/conversion \
+    libs/detail \
+    libs/exception \
+    libs/function \
+    libs/function_types \
+    libs/fusion \
+    libs/intrusive \
+    libs/io \
+    libs/lambda \
+    libs/math \
+    libs/move \
+    libs/optional \
+    libs/predef \
+    libs/range \
+    libs/ratio \
+    libs/rational \
+    libs/regex \
+    libs/static_assert \
+    libs/smart_ptr \
+    libs/system \
+    libs/throw_exception \
+    libs/timer \
+    libs/tuple \
+    libs/type_index \
+    libs/typeof \
+    libs/unordered \
+    libs/utility \
+    libs/winapi
 
 if [ -d ./.git ]; then
     echo "get-boost: git log --stat -1"
