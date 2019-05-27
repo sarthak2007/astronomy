@@ -1,6 +1,6 @@
 # Astronomy library
 
-## **introduction**
+## **Introduction**
 
 Development of Astronomy library started as a part Google Summer of Code 2018 under mentor organization **Boost C++ Library** and mentor/guide **Vinícius dos Santos Oliveira**. 
 
@@ -8,7 +8,7 @@ This library provides basic functionalities which are required daily in the fiel
 
 This library was developed using boost version *1.67.0*
 
-## **Intended Audiance**
+## **Intended Audience**
 
 This library is designed for the programmers who are new to C++. It provides easy APIs which are easy to learn for the new C++ developer. While developing this we have kept scientist in mind because not all the scientists are programmers so instead of investing much time in learning library or C++ they can invest time in their real work.
 

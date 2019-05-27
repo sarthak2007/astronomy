@@ -8,7 +8,7 @@ All the representation classes use [boost::geometry::model::point](https://www.b
 
 ## Supported Representation in this libarary:
 1. Cartesian Representation
-2. Shperical Representation
+2. Spherical Representation
 3. Equatorial Representation
 
 >**Note:** While using this library we insist you use Equatorial Representation only when you are using it for locations on earth with longitude and latitude.

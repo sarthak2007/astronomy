@@ -18,7 +18,7 @@ To access any of the component in any representation methods as below can be use
 `get_<component1>_<component2>_<component3>()`<br>
 `set_<component1>_<component2>_<component3>()`<br>
 Here `<component>` is supposed to be replaced by the corrosponding component of the representation.<br>
-E.g:- for cartesian_representatino its `get_x()` which will change for spherical_representation to `get_lat()`
+E.g:- for cartesian_representation its `get_x()` which will change for spherical_representation to `get_lat()`
 
 ## Cartesian Point
 This representation uses (x, y, z) components to represent any point in the 3D space. This is the most widely used for regular geometry in maths.
