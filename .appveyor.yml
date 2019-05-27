@@ -55,7 +55,7 @@ before_build:
   - .\b2 headers > NUL
   - if DEFINED GENERATOR .\b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% --with-filesystem --with-test stage
 
-build: off
+build: on
 
 build_script:
   - if NOT DEFINED GENERATOR b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% libs/astronomy/test

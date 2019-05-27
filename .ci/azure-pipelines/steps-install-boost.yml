@@ -15,7 +15,7 @@ steps:
   - bash: |
       export BSD_DIR=$PWD
       cd ..
-      export GIL_DIR=$PWD/gil
+      export GIL_DIR=$PWD/astronomy
       echo "Copying $BSD_DIR to $GIL_DIR"
       cp -a $BSD_DIR $GIL_DIR
       cd $BSD_DIR
