@@ -1,4 +1,4 @@
-# AppVeyor for Boost.GIL
+# AppVeyor for Boost.Astronomy
 #
 # Copyright 2016, 2017 Peter Dimov
 # Copyright 2018 Mateusz Loskot <mateusz at loskot dot net>
@@ -7,7 +7,7 @@
 #
 version: 1.0.{build}-{branch}
 
-# Current Boost.GIL develop branch (future Boost 1.68) requires C++11
+# Current Boost.Astronomy develop branch (future Boost 1.68) requires C++11
 # Since VS2017, MSVC default is /std:c++14, so no explicit switch is required.
 image: Visual Studio 2017
 
@@ -118,20 +118,10 @@ before_build:
 build: off
 
 build_script:
-  - if NOT DEFINED GENERATOR b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% libs/gil/test
-  - if NOT DEFINED GENERATOR b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% libs/gil/toolbox/test
-  - if NOT DEFINED GENERATOR b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% libs/gil/numeric/test
-  - if NOT DEFINED GENERATOR b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% include=%VCPKG_I% library-path=%VCPKG_L% libs/gil/io/test//simple
-  - if DEFINED GENERATOR cd libs\gil && md build && cd build
+  - if NOT DEFINED GENERATOR b2 address-model=%AM% toolset=%TOOLSET% variant=%VARIANT% cxxstd=%CXXSTD% libs/astronomy/test
+  - if DEFINED GENERATOR cd libs\astronomy && md build && cd build
   - if DEFINED GENERATOR cmake -G "%GENERATOR%" -DCMAKE_CXX_STANDARD=%CXXSTD% -DBoost_DETAILED_FAILURE_MSG=ON -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - if DEFINED GENERATOR cmake --build . --config %CMAKE_CONFIG %
 
 test_script:
   - if DEFINED GENERATOR ctest -V --output-on-failure -C %VARIANT%
-
-notifications:
-  - provider: Webhook
-    url: https://webhooks.gitter.im/e/e9e4892cdeb7cbff2e5a
-    on_build_success: false
-    on_build_failure: true
-    on_build_status_changed: true
