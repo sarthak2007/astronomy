@@ -43,6 +43,7 @@ git submodule update -q --init tools/boost_install
 git submodule update -q --init tools/boostdep
 git submodule update -q --init tools/build
 mkdir -p libs/$SELF
+mkdir -p boost/$SELF
 cp -r $TRAVIS_BUILD_DIR/* libs/$SELF
 cp -r $TRAVIS_BUILD_DIR/include boost/$SELF
 export BOOST_ROOT="`pwd`"
