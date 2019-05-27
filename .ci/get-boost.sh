@@ -90,16 +90,16 @@ if [ -d ./.git ]; then
     git log -1
 fi
 
-echo "get-boost: Deleting $PWD/libs/gil cloned with Boost superproject"
-rm -rf libs/gil
+echo "get-boost: Deleting $PWD/libs/astronomy cloned with Boost superproject"
+rm -rf libs/astronomy
 
 echo "get-boost: Copying $BUILD_DIR to $PWD/libs"
-mkdir libs/gil
+mkdir libs/astronomy
 cp -r $BUILD_DIR libs/
 
-if [ -d libs/gil/.git ]; then
+if [ -d libs/astronomy/.git ]; then
     current_pwd=`pwd`
-    cd libs/gil
+    cd libs/astronomy
     echo "get-boost: git log --stat -1"
     git log -1
     cd $current_pwd
