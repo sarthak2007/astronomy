@@ -208,16 +208,16 @@ script:
     fi
   - |-
     echo "using $TOOLSET : : $COMPILER : ;" > ~/user-config.jam
-  - travis_retry libs/gil/.ci/build-and-test.sh
+  - travis_retry libs/astronomy/.ci/build-and-test.sh
 
 after_success:
 # Upload docs only when building upstream.
   - |-
     if [ "$DOC" -a \
-          "$TRAVIS_REPO_SLUG" = "boostorg/gil" -a \
+          "$TRAVIS_REPO_SLUG" = "sarthak2007/astronomy" -a \
           "$TRAVIS_PULL_REQUEST" = "false" ]; then
       export GH_TOKEN
-      cd libs/gil
+      cd libs/astronomy
       .ci/upload_docs.sh
     fi
 
