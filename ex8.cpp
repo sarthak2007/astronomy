@@ -29,9 +29,9 @@ int main(){
    }
    {
    	using namespace boost::units::si;	
-   		quantity<si::length> si1(3* meters);
-   		quantity<si::length> si2(3* centi*meters);
-   		quantity<si::length> si3(3* kilo*meters);
+   		quantity<length> si1(3.5* meters);
+   		quantity<length> si2(3* centi*meters);
+   		quantity<length> si3(3* kilo*meters);
 
 
    		std::cout << si1 << " = " << quantity<si::length>(si1) << std::endl
