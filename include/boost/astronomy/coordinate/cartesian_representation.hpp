@@ -14,6 +14,14 @@
 #include <boost/astronomy/coordinate/base_representation.hpp>
 #include <boost/astronomy/coordinate/cartesian_differential.hpp>
 
+#include <boost/units/io.hpp>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/prefixes.hpp>
+#include <boost/units/systems/cgs.hpp>
+#include <boost/units/systems/si.hpp>
+
+#include <boost/astronomy/coordinate/ex8.hpp>
+
 
 namespace boost
 {
@@ -31,11 +39,13 @@ namespace boost
                 cartesian_representation(){}
 
                 //!constructs object from provided value of coordinates
-                cartesian_representation(double x, double y=0.0, double z=0.0)
+                // using namespace boost::units;
+                template <typename unit_x,typename unit_y,typename unit_z>
+                cartesian_representation(boost::units::quantity<unit_x> x, boost::units::quantity<unit_y> y,boost::units::quantity<unit_z> z)
                 {
-                    boost::geometry::set<0>(this->point, x);
-                    boost::geometry::set<1>(this->point, y);
-                    boost::geometry::set<2>(this->point, z);
+                    boost::geometry::set<0>(this->point, boost::units::quantity<boost::units::si::length>(x).value());
+                    boost::geometry::set<1>(this->point, boost::units::quantity<boost::units::si::length>(y).value());
+                    boost::geometry::set<2>(this->point, boost::units::quantity<boost::units::si::length>(z).value());
                 }
 
                 //!constructs object from boost::geometry::model::point object
@@ -64,67 +74,75 @@ namespace boost
                 }
 
                 //! returns the (x, y, z) in the form of tuple
-                std::tuple<double, double, double> get_xyz() const
+                template <typename unit_x,typename unit_y,typename unit_z>
+                std::tuple<boost::units::quantity<unit_x>, boost::units::quantity<unit_y>,boost::units::quantity<unit_z>> get_xyz() const
                 {
-                    return std::make_tuple(boost::geometry::get<0>(this->point),
-                        boost::geometry::get<1>(this->point), boost::geometry::get<2>(this->point));
+                    return std::make_tuple(boost::units::quantity<unit_x>(boost::geometry::get<0>(this->point)*boost::units::si::meters),
+                        boost::units::quantity<unit_y>(boost::geometry::get<1>(this->point)*boost::units::si::meters), boost::units::quantity<unit_z>(boost::geometry::get<2>(this->point)*boost::units::si::meters));
                 }
 
-                //!returns the x component of point
-                double get_x() const
+                //!returns the x component of point in desired units
+                template <typename ReturnType>
+                boost::units::quantity<ReturnType> get_x() const
                 {
-                    return boost::geometry::get<0>(this->point);
+                    return boost::units::quantity<ReturnType>(boost::geometry::get<0>(this->point)*boost::units::si::meters);
                 }
 
-                //!returns the y component of point
-                double get_y() const
+                //!returns the y component of point in desired units
+                template <typename ReturnType>
+                boost::units::quantity<ReturnType> get_y() const
                 {
-                    return boost::geometry::get<1>(this->point);
+                    return boost::units::quantity<ReturnType>(boost::geometry::get<1>(this->point)*boost::units::si::meters);
                 }
 
-                //!returns the z component of point
-                double get_z() const
+                //!returns the z component of point in desired units
+                template <typename ReturnType>
+                boost::units::quantity<ReturnType> get_z() const
                 {
-                    return boost::geometry::get<2>(this->point);
+                    return boost::units::quantity<ReturnType>(boost::geometry::get<2>(this->point)*boost::units::si::meters);
                 }
 
                 //!set value of (x, y, z) in current object
-                void set_xyz(double x, double y, double z)
+                template <typename unit_x,typename unit_y,typename unit_z> 
+                void set_xyz(boost::units::quantity<unit_x> x, boost::units::quantity<unit_y> y,boost::units::quantity<unit_z> z)
                 {
-                    boost::geometry::set<0>(this->point, x);
-                    boost::geometry::set<1>(this->point, y);
-                    boost::geometry::set<2>(this->point, z);
+                    boost::geometry::set<0>(this->point, boost::units::quantity<boost::units::si::length>(x).value());
+                    boost::geometry::set<1>(this->point, boost::units::quantity<boost::units::si::length>(y).value());
+                    boost::geometry::set<2>(this->point, boost::units::quantity<boost::units::si::length>(z).value());
                 }
 
-                //!set value of x component of point
-                void set_x(double x)
+                //!set value of x component of point in desired units
+                template <typename unit_x>
+                void set_x(boost::units::quantity<unit_x> x)
                 {
-                    boost::geometry::set<0>(this->point, x);
+                    boost::geometry::set<0>(this->point, boost::units::quantity<boost::units::si::length>(x).value());
                 }
 
-                //!set value of y component of point
-                void set_y(double y)
+                //!set value of y component of point in desired units
+                template <typename unit_y>
+                void set_y(boost::units::quantity<unit_y> y)
                 {
-                    boost::geometry::set<1>(this->point, y);
+                    boost::geometry::set<1>(this->point, boost::units::quantity<boost::units::si::length>(y).value());
                 }
 
-                //!set value of z component of point
-                void set_z(double z)
+                //!set value of z component of point in desired units
+                template <typename unit_z>
+                void set_z(boost::units::quantity<unit_z> z)
                 {
-                    boost::geometry::set<2>(this->point, z);
+                    boost::geometry::set<2>(this->point, boost::units::quantity<boost::units::si::length>(z).value());
                 }
 
-                boost::astronomy::coordinate::cartesian_representation 
-                    operator +(boost::astronomy::coordinate::cartesian_differential const& diff) const 
-                {
-                    boost::astronomy::coordinate::cartesian_representation temp(this->point);
+                // boost::astronomy::coordinate::cartesian_representation 
+                //     operator +(boost::astronomy::coordinate::cartesian_differential const& diff) const 
+                // {
+                //     boost::astronomy::coordinate::cartesian_representation temp(this->point);
 
-                    temp.set_x(temp.get_x() + diff.get_dx());
-                    temp.set_y(temp.get_y() + diff.get_dy());
-                    temp.set_z(temp.get_z() + diff.get_dz());
+                //     temp.set_x(temp.get_x() + diff.get_dx());
+                //     temp.set_y(temp.get_y() + diff.get_dy());
+                //     temp.set_z(temp.get_z() + diff.get_dz());
 
-                    return temp;
-                }
+                //     return temp;
+                // }
 
             }; //cartesian_representation
         } //namespace coordinate
