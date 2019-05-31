@@ -29,11 +29,15 @@ int main()
 
     std::cout << "point1_x = " <<  point1.get_x<length>() << std::endl;
 
+    std::cout << std::endl;
+
     quantity<length> si4(3* centi*meters);
 
     point1.set_x<length>(si4);
 
     std::cout << "point1_x = " <<  point1.get_x<length>() << std::endl;
+
+    std::cout << std::endl;
 
     quantity<length> a(1*meters);
     quantity<foot_length> b(1*foots);
@@ -44,11 +48,20 @@ int main()
     std::cout << "point1_y = " <<  point1.get_y<length>() << std::endl;
     std::cout << "point1_z = " <<  point1.get_z<length>() << std::endl;    
 
+    std::cout << std::endl;
+
     // //creating a point from another point
     cartesian_representation point2(point1); //or point2 = point1
 
     std::cout << "point2_x = " <<  point2.get_x<length>() << std::endl;    
 
+    std::cout << std::endl;
 
+    //using tuple
+    std::tuple<quantity<length>, quantity<foot_length>, quantity<length>> components = point2.get_xyz<length,foot_length,length>();
+
+    std::cout << "x_tuple = " << std::get<0>(components) << std::endl;
+    std::cout << "y_tuple = " << std::get<1>(components) << std::endl;
+    std::cout << "z_tuple = " << std::get<2>(components) << std::endl;
     return 0;
 }
