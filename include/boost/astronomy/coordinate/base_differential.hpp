@@ -53,7 +53,7 @@ public:
             "return type is expected to be a differential class");
 
         bg::model::point<CoordinateType, 3, bg::cs::cartesian> tempPoint;
-        double mag = this->magnitude();  //magnitude of vector stored in current object
+        double mag = this->magnitude(); //magnitude of vector stored in current object
         
         //converting coordinate/vector into cartesian
         bg::transform(this->diff, tempPoint); 
