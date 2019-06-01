@@ -36,8 +36,8 @@ protected:
 
 public:
 
-    typedef typename CoordinateSystem system;
-    typedef typename CoordinateType type;
+    typedef CoordinateSystem system;
+    typedef CoordinateType type;
 
     //! returns the unit vector of current differential
     template <typename ReturnType>
@@ -134,7 +134,7 @@ public:
         /*converting both coordinates/vector into cartesian system*/
         bg::model::point
         <
-            std::conditional
+            typename std::conditional
             <
                 sizeof(OtherCoordinateType) >= sizeof(CoordinateType),
                 OtherCoordinateType,
@@ -146,12 +146,12 @@ public:
         bg::transform(this->diff, tempPoint1);
         bg::transform(other.get_differential(), tempPoint2);
 
-        return (tempPoint1.get<0>() == tempPoint2.get<0>()) &&
-            (tempPoint1.get<1>() == tempPoint2.get<1>()) &&
-            (tempPoint1.get<2>() == tempPoint2.get<2>());
+        return (bg::get<0>(tempPoint1) == bg::get<0>(tempPoint2)) &&
+            (bg::get<1>(tempPoint1) == bg::get<1>(tempPoint2)) &&
+            (bg::get<2>(tempPoint1) == bg::get<2>(tempPoint2));
     }
 
 }; //base_differential
-}}} // namespace boost::astronomy::coordinate
+}}} //namespace boost::astronomy::coordinate
 
 #endif // !BOOST_ASTRONOMY_COORDINATE_BASE_DIFFERENTIAL_HPP
