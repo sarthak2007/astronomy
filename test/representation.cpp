@@ -74,9 +74,9 @@ BOOST_AUTO_TEST_CASE(spherical)
 
     //copy constructor
     auto point2 = make_spherical_representation(point1);
-    BOOST_CHECK_CLOSE(point2.get_lat().value(), point1.get_lat().value(), 45.0, 0.001);
-    BOOST_CHECK_CLOSE(point2.get_lon().value(), point1.get_lon().value(), 18.0, 0.001);
-    BOOST_CHECK_CLOSE(point2.get_dist().value(), point1.get_dist().value(), 3.0, 0.001);
+    BOOST_CHECK_CLOSE(point2.get_lat().value(), point1.get_lat().value(), 0.001);
+    BOOST_CHECK_CLOSE(point2.get_lon().value(), point1.get_lon().value(), 0.001);
+    BOOST_CHECK_CLOSE(point2.get_dist().value(), point1.get_dist().value(), 0.001);
 
     //constructing from boost::geometry::model::point
     model::point<double, 3, boost::geometry::cs::cartesian> model_point(50, 20, 30);
