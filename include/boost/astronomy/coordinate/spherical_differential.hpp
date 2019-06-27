@@ -18,7 +18,7 @@
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_differential.hpp>
 #include <boost/astronomy/coordinate/cartesian_differential.hpp>
-
+#include <iostream>
 namespace boost { namespace astronomy { namespace coordinate {
 
 namespace bu = boost::units;
@@ -111,7 +111,6 @@ public:
         BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
             <boost::astronomy::coordinate::base_differential, Differential>::value),
             "No constructor found with given argument type");
-
         auto temp = make_spherical_differential(other);
         bg::transform(temp.get_differential(), this->diff);
     }
@@ -315,8 +314,7 @@ make_spherical_differential
         DistQuantity
     > const& other
 )
-{
-    return make_spherical_differential(
+{    return make_spherical_differential(
         static_cast<ReturnLatQuantity>(other.get_dlat()),
         static_cast<ReturnLonQuantity>(other.get_dlon()),
         static_cast<ReturnDistQuantity>(other.get_ddist())
@@ -385,7 +383,7 @@ make_spherical_differential
         OtherCoordinateSystem
     > const& pointObject
 )
-{
+{ 
     return spherical_differential
         <
             CoordinateType,
@@ -398,72 +396,39 @@ make_spherical_differential
 //!constructs object from any type of cartesian differential
 template 
 <
-    typename OtherCoordinateType,
-    typename XQuantity,
-    typename YQuantity,
-    typename ZQuantity
+    typename OtherDifferential
 >
-spherical_differential
-<
-    OtherCoordinateType,
-    bu::quantity<bu::si::plane_angle, OtherCoordinateType>,
-    bu::quantity<bu::si::plane_angle, OtherCoordinateType>,
-    XQuantity
->
-make_spherical_differential
+auto make_spherical_differential
 (
-    cartesian_differential
-    <
-        OtherCoordinateType,
-        XQuantity,
-        YQuantity,
-        ZQuantity
-    > const& other
+    OtherDifferential const& object
 )
 {
+    auto temp = make_cartesian_differential(object);
+
+    typedef decltype(temp) cartesian_type;
+
     bg::model::point
         <
-            OtherCoordinateType,
+            typename cartesian_type::type,
             3,
             bg::cs::cartesian
         > tempPoint;
 
-    bg::set<0>(tempPoint, other.get_dx().value());
-    bg::set<1>(tempPoint, static_cast<XQuantity>(other.get_dy()).value());
-    bg::set<2>(tempPoint, static_cast<XQuantity>(other.get_dz()).value());
+    bg::set<0>(tempPoint, temp.get_dx().value());
+    bg::set<1>(tempPoint, static_cast<typename cartesian_type::quantity1>(temp.get_dy()).value());
+    bg::set<2>(tempPoint, static_cast<typename cartesian_type::quantity1>(temp.get_dz()).value());
 
-    bg::model::point<OtherCoordinateType, 3, bg::cs::spherical<radian>> result;
+    bg::model::point<typename cartesian_type::type, 3, bg::cs::spherical<radian>> result;
     bg::transform(tempPoint, result);
-
     return spherical_differential
         <
-            OtherCoordinateType,
-            bu::quantity<bu::si::plane_angle, OtherCoordinateType>,
-            bu::quantity<bu::si::plane_angle, OtherCoordinateType>,
-            XQuantity
+            typename cartesian_type::type,
+            bu::quantity<bu::si::plane_angle, typename cartesian_type::type>,
+            bu::quantity<bu::si::plane_angle, typename cartesian_type::type>,
+            typename cartesian_type::quantity1
         >(result);
 }
 
-//!constructs object from any type of spherical equatorial differential
-template <typename OtherDifferential>
-spherical_differential
-<
-    typename OtherDifferential::type,
-    typename OtherDifferential::quantity1,
-    typename OtherDifferential::quantity2,
-    typename OtherDifferential::quantity3
->
-make_spherical_differential(OtherDifferential const& other)
-{
-
-    return spherical_differential
-        <
-            typename OtherDifferential::type,
-            typename OtherDifferential::quantity1,
-            typename OtherDifferential::quantity2,
-            typename OtherDifferential::quantity3
-        >(other.get_differential());
-}
 }}}//namespace boost::astronomy::coordinate
 
 #endif // !BOOST_ASTRONOMY_COORDINATE_SPHERICAL_DIFFERENTIAL_HPP
