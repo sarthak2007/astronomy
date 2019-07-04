@@ -228,7 +228,7 @@ public:
             LatQuantity,
             LonQuantity,
             DistQuantity
-        > result = make_spherical_differential(temp);
+        > result = make_spherical_representation(temp);
 
         return result;
     }
@@ -371,43 +371,31 @@ make_spherical_representation
 //!Create cartesian_representation from other type of representations
 template
 <
-    typename CoordinateType,
-    typename XQuantity,
-    typename YQuantity,
-    typename ZQuantity
+    typename OtherRepresentation
 >
-spherical_representation
-<
-    CoordinateType,
-    bu::quantity<bu::si::plane_angle, CoordinateType>,
-    bu::quantity<bu::si::plane_angle, CoordinateType>,
-    XQuantity
-> make_spherical_representation
-(cartesian_representation<CoordinateType, XQuantity, YQuantity, ZQuantity> const& other)
+auto make_spherical_representation
+(
+    OtherRepresentation const& other
+)
 {
-    typedef cartesian_representation
-        <
-        CoordinateType,
-        XQuantity,
-        YQuantity,
-        ZQuantity
-        > cartesian_type;
+    auto temp = make_cartesian_representation(other);
+    typedef decltype(temp) cartesian_type;
 
     bg::model::point<typename cartesian_type::type, 3, bg::cs::cartesian> tempPoint;
     bg::model::point<typename cartesian_type::type, 3, bg::cs::spherical<radian>> result;
 
-    bg::set<0>(tempPoint, other.get_x().value());
+    bg::set<0>(tempPoint, temp.get_x().value());
     bg::set<1>
     (
         tempPoint,
         static_cast<typename cartesian_type::quantity1>
-        (other.get_y()).value()
+        (temp.get_y()).value()
     );
     bg::set<2>
     (
         tempPoint,
         static_cast<typename cartesian_type::quantity1>
-        (other.get_z()).value()
+        (temp.get_z()).value()
     );
 
     bg::transform(tempPoint, result);
@@ -419,28 +407,6 @@ spherical_representation
             bu::quantity<bu::si::plane_angle, typename cartesian_type::type>,
             typename cartesian_type::quantity1
         >(result);
-}
-
-//!Create spherical_equatorial_representation from other type of representations
-//A general implementation is used to avoid including spherical_equatorial_representation.hpp
-//error: using spherical_equatorial_representation before it's declaration
-template<typename OtherRepresentation>
-spherical_representation
-<
-    typename OtherRepresentation::type,
-    typename OtherRepresentation::quantity1,
-    typename OtherRepresentation::quantity2,
-    typename OtherRepresentation::quantity3
->
-make_spherical_representation(OtherRepresentation const& other)
-{
-    return spherical_representation
-        <
-        typename OtherRepresentation::type,
-        typename OtherRepresentation::quantity1,
-        typename OtherRepresentation::quantity2,
-        typename OtherRepresentation::quantity3
-        >(other.get_point());
 }
 
 }}} //namespace boost::astronomy::coordinate
