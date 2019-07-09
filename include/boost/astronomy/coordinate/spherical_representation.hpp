@@ -300,10 +300,10 @@ make_spherical_representation
     > const& other
 )
 {
-    return make_cartesian_representation(
-        static_cast<ReturnLatQuantity>(other.get_x()),
-        static_cast<ReturnLonQuantity>(other.get_y()),
-        static_cast<ReturnDistQuantity>(other.get_z())
+    return make_spherical_representation(
+        static_cast<ReturnLatQuantity>(other.get_lat()),
+        static_cast<ReturnLonQuantity>(other.get_lon()),
+        static_cast<ReturnDistQuantity>(other.get_dist())
     );
 }
 
