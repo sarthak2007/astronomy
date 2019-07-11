@@ -17,7 +17,7 @@ trigger:
 pr:
   branches:
     include:
-    - develop
+    - '*'
 
 variables:
   - name: B2_VARIANT
