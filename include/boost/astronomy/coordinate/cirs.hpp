@@ -1,68 +1,72 @@
 #ifndef BOOST_ASTRONOMY_COORDINATE_CIRS_HPP
 #define BOOST_ASTRONOMY_COORDINATE_CIRS_HPP
 
-#include <string>
-
 #include <boost/date_time/posix_time/posix_time.hpp>
-
 #include <boost/astronomy/coordinate/base_equatorial_frame.hpp>
 
-namespace boost
+namespace boost { namespace astronomy { namespace coordinate {
+
+template
+<
+    typename Representation, typename Differential
+>
+struct cirs : public base_equatorial_frame<Representation, Differential>
 {
-    namespace astronomy
+
+protected:
+    //!time used to determine the position of earth at the time of observation
+    boost::posix_time::ptime obs_time; 
+
+public:
+    //default constructor no initialization
+    cirs() {}
+
+    //!constructs object from another representation object
+    template <typename OtherRepresentation>
+    cirs(OtherRepresentation const& representation_data) : base_equatorial_frame
+        <Representation, Differential>(representation_data) {}
+
+    //!constructs object from provided components of representation
+    cirs
+    (
+        typename Representation::quantity1 const& dec,
+        typename Representation::quantity2 const& ra,
+        typename Representation::quantity3 const& distance
+    ) : base_equatorial_frame<Representation, Differential>(dec, ra, distance) {}
+
+    //!constructs object from provided components of representation and differential
+    cirs
+    (
+        typename Representation::quantity1 const& dec,
+        typename Representation::quantity2 const& ra,
+        typename Representation::quantity3 const& distance,
+        typename Differential::quantity1 const& pm_dec,
+        typename Differential::quantity2 const& pm_ra_cosdec,
+        typename Differential::quantity3 const& radial_velocity
+    ) : base_equatorial_frame<Representation, Differential>
+            (dec, ra, distance, pm_dec, pm_ra_cosdec, radial_velocity) {}
+
+    //!constructs object from other representation and differential objects
+    template <typename OtherRepresentation, typename OtherDifferential>
+    cirs
+    (
+        OtherRepresentation const& representation_data,
+        OtherDifferential const& differential_data
+    ) : base_equatorial_frame<Representation, Differential>
+            (representation_data, differential_data) {}
+
+    boost::posix_time::ptime get_obs_time() const
     {
-        namespace coordinate
-        {
-            template <typename RepresentationDegreeOrRadian = degree,
-                typename DifferentialDegreeOrRadian = degree>
-            struct cirs : public boost::astronomy::coordinate::base_equatorial_frame
-                <RepresentationDegreeOrRadian, DifferentialDegreeOrRadian>
-            {
-            protected:
-                boost::posix_time::ptime obs_time; //!time used to determine the position of earth at the time of observation
+        return this->obstime;
+    }
 
-            public:
-                //default constructor no initialization
-                cirs() {}
+    void set_obs_time(boost::posix_time::ptime const& time)
+    {
+        this->obstime = time;
+    }
+};
 
-                template <typename Representation>
-                cirs(Representation const& representation_data) : base_equatorial_frame
-                    <RepresentationDegreeOrRadian, DifferentialDegreeOrRadian>(representation_data) {}
-
-                /*!RA is expected to be a double if value is in degree/radian
-                if want to provide value in hours minute sec formate then a string expected with particular format
-                hour angle formate: "hhmmss..."
-                first two char as hours next two as minutes and remaining are treated as seconds
-                hour angles are converted to degree/radian and then stored
-                eg: if RA = 06h 45m 08.9s then value should be provided like "064508.9" */
-                template <typename RaType>
-                cirs(double dec, RaType ra, double distance) : base_equatorial_frame
-                    <RepresentationDegreeOrRadian, DifferentialDegreeOrRadian>(dec, ra, distance) {}
-
-                template <typename RaType>
-                cirs(double dec, RaType ra, double distance, double pm_dec, double pm_ra_cosdec, double radial_velocity) :
-                    base_equatorial_frame<RepresentationDegreeOrRadian, DifferentialDegreeOrRadian>
-                    (dec, ra, distance, pm_dec, pm_ra_cosdec, radial_velocity) {}
-
-                template <typename Representation, typename Differential>
-                cirs(Representation const& representation_data, Differential const& diff) :
-                    base_equatorial_frame<RepresentationDegreeOrRadian, DifferentialDegreeOrRadian>
-                    (representation_data, diff) {}
-
-                boost::posix_time::ptime get_obs_time() const
-                {
-                    return this->obstime;
-                }
-
-                void set_obs_time(boost::posix_time::ptime const& time)
-                {
-                    this->obstime = time;
-                }
-
-            };
-        } //namespace coordinate
-    } //namespace astronomy
-} //namespace boost
+}}} //namespace boost::astronomy::coordinate
 
 #endif // !BOOST_ASTRONOMY_COORDINATE_CIRS_HPP
 
