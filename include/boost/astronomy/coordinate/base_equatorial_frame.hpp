@@ -2,245 +2,250 @@
 #define BOOST_ASTRONOMY_COORDINATE_BASE_EQUATORIAL_FRAME_HPP
 
 #include <type_traits>
-#include <string>
-
-#include <boost/geometry/core/cs.hpp>
-#include <boost/geometry/geometries/point.hpp>
-#include <boost/geometry/algorithms/transform.hpp>
-#include <boost/geometry/algorithms/equals.hpp>
-#include <boost/lexical_cast.hpp>
-
-#include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_frame.hpp>
 #include <boost/astronomy/coordinate/spherical_representation.hpp>
 #include <boost/astronomy/coordinate/spherical_coslat_differential.hpp>
 
-namespace boost
+namespace boost { namespace astronomy { namespace coordinate {
+
+namespace bu = boost::units;
+namespace bg = boost::geometry;
+
+template
+<
+    typename Representation, typename Differential
+>
+struct base_equatorial_frame : public base_frame<Representation, Differential>
 {
-    namespace astronomy
+    ///@cond INTERNAL
+    BOOST_STATIC_ASSERT_MSG((std::is_base_of
+            <spherical_representation<typename Representation::type, 
+            typename Representation::quantity1, typename Representation::quantity2,
+            typename Representation::quantity3>, Representation>::value),
+            "argument type is expected to be a spherical_representation class");
+    BOOST_STATIC_ASSERT_MSG((std::is_base_of
+            <spherical_coslat_differential<typename Differential::type, 
+            typename Differential::quantity1, typename Differential::quantity2,
+            typename Differential::quantity3>, Differential>::value),
+            "argument type is expected to be a spherical_coslat_differential class");
+    ///@endcond
+
+public:
+    //default constructor no initialization
+    base_equatorial_frame() {}
+
+    //!constructs object from another representation object
+    template <typename OtherRepresentation>
+    base_equatorial_frame(OtherRepresentation const& representation_data)
     {
-        namespace coordinate
-        {
-            template <typename RepresentationDegreeOrRadian = boost::astronomy::coordinate::degree,
-                typename DifferentialDegreeOrRadian = boost::astronomy::coordinate::degree>
-            struct base_equatorial_frame : public boost::astronomy::coordinate::base_frame
-                <boost::astronomy::coordinate::spherical_representation<RepresentationDegreeOrRadian>,
-                boost::astronomy::coordinate::spherical_coslat_differential<DifferentialDegreeOrRadian>>
-            {
-            public:
-                //default constructor no initialization
-                base_equatorial_frame() {}
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+            <boost::astronomy::coordinate::base_representation, OtherRepresentation>::value),
+            "argument type is expected to be a representation class");
+        
+        auto temp = make_spherical_representation
+            <
+                typename Representation::type,
+                typename Representation::quantity1,
+                typename Representation::quantity2,
+                typename Representation::quantity3,
+                typename OtherRepresentation::type,
+                typename OtherRepresentation::quantity1,
+                typename OtherRepresentation::quantity2,
+                typename OtherRepresentation::quantity3
+            >(representation_data);
+        this->data = temp;
+    }
 
-                template <typename Representation>
-                base_equatorial_frame(Representation const& representation_data)
-                {
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_representation, Representation>::value),
-                        "argument type is expected to be a representation class");
-                    this->data = representation_data;
-                }
+    //!constructs object from provided components of representation
+    base_equatorial_frame
+    (
+        typename Representation::quantity1 const& dec,
+        typename Representation::quantity2 const& ra,
+        typename Representation::quantity3 const& distance
+    )
+    {
+        this->set_dec(dec);
+        this->set_ra(ra);
+        this->set_distance(distance);
+    }
 
-                
-                /*!if want to provide value in hours:minute:sec formate then a string expected with particular format
-                hour angle formate: "hhmmss..."
-                first two char as hours next two as minutes and remaining are treated as seconds
-                hour angles are converted to degree/radian and then stored
-                eg: if RA = 06h 45m 08.9s then value should be provided like "064508.9"*/
-                base_equatorial_frame(double dec, std::string const& ra, double distance)
-                {
-                    double ra_final;
-                    
-                    if (std::is_same<RepresentationDegreeOrRadian, degree>::value)
-                    {
-                        ra_final = (boost::lexical_cast<double>(ra.substr(0, 2)) * 15.0) +
-                            (boost::lexical_cast<double>(ra.substr(2, 2)) / 4.0) +
-                            (boost::lexical_cast<double>(ra.substr(4)) / 240.0);
-                    }
-                    else
-                    {
-                        ra_final = ((boost::lexical_cast<double>(ra.substr(0, 2)) * 15.0) +
-                            (boost::lexical_cast<double>(ra.substr(2, 2)) / 4.0) +
-                            (boost::lexical_cast<double>(ra.substr(4)) / 240.0)) * 0.0174533;
-                    }
-                    
-                    this->data.set_lat_lon_dist(dec, ra_final, distance);
-                }
+    //!constructs object from provided components of representation and differential
+    base_equatorial_frame
+    (
+        typename Representation::quantity1 const& dec,
+        typename Representation::quantity2 const& ra,
+        typename Representation::quantity3 const& distance,
+        typename Differential::quantity1 const& pm_dec,
+        typename Differential::quantity2 const& pm_ra_cosdec,
+        typename Differential::quantity3 const& radial_velocity
+    ) : base_equatorial_frame(dec, ra, distance)
+    {
+        this->motion.set_dlat_dlon_coslat_ddist(pm_dec, pm_ra_cosdec, radial_velocity);
+    }
 
-                //!RA is expected to be a double if value is in degree/radian
-                base_equatorial_frame(double dec, double ra, double distance)
-                {
-                    this->data.set_lat_lon_dist(dec, ra, distance);
-                }
+    //!constructs object from other representation and differential
+    template <typename OtherRepresentation, typename OtherDifferential>
+    base_equatorial_frame
+    (
+        OtherRepresentation const& representation_data,
+        OtherDifferential const& differential_data
+    )
+    {
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+            <boost::astronomy::coordinate::base_representation, OtherRepresentation>::value),
+            "argument type is expected to be a representation class");
+        
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+            <boost::astronomy::coordinate::base_differential, OtherDifferential>::value),
+            "argument type is expected to be a differential class");
 
-                template <typename RaType>
-                base_equatorial_frame
-                (double dec, RaType const& ra, double distance, double pm_dec, double pm_ra_cosdec, double radial_velocity):
-                    base_equatorial_frame(dec, ra, distance)
-                {
-                    this->motion.set_dlat_dlon_coslat_ddist(pm_dec, pm_ra_cosdec, radial_velocity);
-                }
+        auto rep_temp = make_spherical_representation
+            <
+                typename Representation::type,
+                typename Representation::quantity1,
+                typename Representation::quantity2,
+                typename Representation::quantity3,
+                typename OtherRepresentation::type,
+                typename OtherRepresentation::quantity1,
+                typename OtherRepresentation::quantity2,
+                typename OtherRepresentation::quantity3
+            >(representation_data);
+        this->data = rep_temp;
 
-                template <typename Representation, typename Differential>
-                base_equatorial_frame(Representation const& representation_data, Differential const& diff)
-                {
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_representation, Representation>::value),
-                        "argument type is expected to be a representation class");
-                    this->data = representation_data;
+        auto dif_temp = make_spherical_coslat_differential
+            <
+                typename Differential::type,
+                typename Differential::quantity1,
+                typename Differential::quantity2,
+                typename Differential::quantity3,
+                typename OtherDifferential::type,
+                typename OtherDifferential::quantity1,
+                typename OtherDifferential::quantity2,
+                typename OtherDifferential::quantity3
+            >(differential_data);
+        this->motion = dif_temp;
+    }
 
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_differential, Differential>::value),
-                        "argument type is expected to be a differential class");
-                    this->motion = diff;
-                }
+    //!returns Declination component of the coordinate
+    typename Representation::quantity1 get_dec() const
+    {
+        return this->data.get_lat();
+    }
 
-                //!returns Declination component of the coordinate
-                double get_dec() const
-                {
-                    return this->data.get_lat();
-                }
+    //!returns Right Ascension component of the coordinate
+    typename Representation::quantity2 get_ra() const
+    {
+        return this->data.get_lon();
+    }
 
-                //!returns Right Ascension component of the coordinate
-                double get_ra() const
-                {
-                    return this->data.get_lon();
-                }
+    //!returns distance component of the coordinate
+    typename Representation::quantity3 get_distance() const
+    {
+        return this->data.get_dist();
+    }
 
-                //!returns distance component of the coordinate
-                double get_distance() const
-                {
-                    return this->data.get_dist();
-                }
+    //!returns the (dec, ra, dist) in the form of tuple
+    std::tuple
+    <
+        typename Representation::quantity1,
+        typename Representation::quantity2,
+        typename Representation::quantity3
+    > get_dec_ra_dist() const
+    {
+        return this->data.get_lat_lon_dist();
+    }
 
-                //!returns the (dec, ra, dist) in the form of tuple
-                std::tuple<double, double, double> get_dec_ra_dist() const
-                {
-                    return this->data.get_lat_lon_dist();
-                }
+    //!returns proper motion in Declination
+    typename Differential::quantity1 get_pm_dec() const
+    {
+        return this->motion.get_dlat();
+    }
 
-                //!returns proper motion in Declination
-                double get_pm_dec() const
-                {
-                    return this->motion.get_dlat();
-                }
+    //!returns proper motion in Right Ascension including cos(dec)
+    typename Differential::quantity2 get_pm_ra_cosdec() const
+    {
+        return this->motion.get_dlon_coslat();
+    }
 
-                //!returns proper motion in Right Ascension including cos(dec)
-                double get_pm_ra_cosdec() const
-                {
-                    return this->motion.get_dlon_coslat();
-                }
+    //!returns radial_velocity
+    typename Differential::quantity3 get_radial_velocity() const
+    {
+        return this->motion.get_ddist();
+    }
 
-                //!returns radial_velocity
-                double get_radial_velocity() const
-                {
-                    return this->motion.get_ddist();
-                }
+    //!returns the proper motion in form of tuple including cos(dec)
+    std::tuple
+    <
+        typename Differential::quantity1,
+        typename Differential::quantity2,
+        typename Differential::quantity3
+    > get_pm_dec_ra_radial() const
+    {
+        return this->motion.get_dlat_dlon_coslat_ddist();
+    }
 
-                //!returns the proper motion in form of tuple including cos(dec)
-                std::tuple<double, double, double> get_pm_dec_ra_radial() const
-                {
-                    return this->motion.get_dlat_dlon_coslat_ddist();
-                }
+    //!sets value of Declination component of the coordinate
+    void set_dec(typename Representation::quantity1 const& dec)
+    {
+        this->data.set_lat(dec);
+    }
 
-                //!sets value of Declination component of the coordinate
-                void set_dec(double dec)
-                {
-                    this->data.set_lat(dec);
-                }
+    //!sets value of Right Ascension component of the coordinate
+    void set_ra(typename Representation::quantity2 const& ra)
+    {
+        this->data.set_lon(ra);
+    }
 
-                /*!sets value of Right Ascension component of the coordinate
-                if want to provide value in hours:minute:sec formate then a string expected with particular format
-                hour angle formate: "hhmmss..."
-                first two char as hours next two as minutes and remaining are treated as seconds
-                hour angles are converted to degree/radian and then stored
-                eg: RA = 06h 45m 08.9s then value should be provided like "064508.9"*/
-                void set_ra(std::string const& ra)
-                {
-                    double ra_final;
-                    
-                    if (std::is_same<RepresentationDegreeOrRadian, degree>::value)
-                    {
-                        ra_final = boost::lexical_cast<double>(ra.substr(0, 2)) * 15 +
-                            boost::lexical_cast<double>(ra.substr(3, 2)) * 60 +
-                            boost::lexical_cast<double>(ra.substr(4)) * 3600;
-                    }
-                    else
-                    {
-                        ra_final = (boost::lexical_cast<double>(ra.substr(0, 2)) * 15 +
-                            boost::lexical_cast<double>(ra.substr(3, 2)) * 60 +
-                            boost::lexical_cast<double>(ra.substr(4)) * 3600) * 0.0174533;
-                    }
-                    
-                    this->data.set_lon(ra_final);
-                }
-                
-                //!sets value of Right Ascension component of the coordinate
-                //!RA is expected to be a double if value is in degree/radian if it is in hour format see the overloaded funciton
-                void set_ra(double ra)
-                {
-                    this->data.set_lon(ra);
-                }
+    //!sets value of distance component of the coordinate
+    void set_distance(typename Representation::quantity3 const& distance)
+    {
+        this->data.set_dist(distance);
+    }
 
+    //!sets values of all component of the coordinate
+    void set_dec_ra_dist
+    (
+        typename Representation::quantity1 const& dec,
+        typename Representation::quantity2 const& ra,
+        typename Representation::quantity3 const& dist
+    )
+    {
+        this->set_dec(dec);
+        this->set_ra(ra);
+        this->set_distance(dist);
+    }
 
-                //!sets value of distance component of the coordinate
-                void set_distance(double distance)
-                {
-                    this->data.set_dist(distance);
-                }
+    //!sets the proper motion in Declination
+    void set_pm_dec(typename Differential::quantity1 const& pm_dec)
+    {
+        this->motion.set_dlat(pm_dec);
+    }
 
-                //!sets value of all component of the coordinate 
-                void set_dec_ra_dist(double dec, double ra, double dist)
-                {
-                    this->data.set_lat_lon_dist(dec, ra, dist);
-                }
+    //!sets the proper motion in Right Ascension including cos(dec)
+    void set_pm_ra_cosdec(typename Differential::quantity2 const& pm_ra_cosdec)
+    {
+        this->motion.set_dlon_coslat(pm_ra_cosdec);
+    }
 
-                //!sets value of all component of the coordinate (ra in hour angle)
-                void set_dec_ra_dist(double dec, std::string ra, double dist)
-                {
-                    double ra_final;
+    //!sets the radial_velocity
+    void set_radial_velocity(typename Differential::quantity3 const& radial_velocity)
+    {
+        this->motion.set_ddist(radial_velocity);
+    }
 
-                    if (std::is_same<RepresentationDegreeOrRadian, degree>::value)
-                    {
-                        ra_final = boost::lexical_cast<double>(ra.substr(0, 2)) * 15 +
-                            boost::lexical_cast<double>(ra.substr(3, 2)) * 60 +
-                            boost::lexical_cast<double>(ra.substr(4)) * 3600;
-                    }
-                    else
-                    {
-                        ra_final = (boost::lexical_cast<double>(ra.substr(0, 2)) * 15 +
-                            boost::lexical_cast<double>(ra.substr(3, 2)) * 60 +
-                            boost::lexical_cast<double>(ra.substr(4)) * 3600) * 0.0174533;
-                    }
-                    this->data.set_lat_lon_dist(dec, ra_final, dist);
-                }
+    //!set value of motion including cos(dec)
+    void set_pm_dec_ra_radial
+    (
+        typename Differential::quantity1 const& pm_dec,
+        typename Differential::quantity2 const& pm_ra_cosdec,
+        typename Differential::quantity3 const& radial_velocity
+    )
+    {
+        this->motion.set_dlat_dlon_coslat_ddist(pm_dec, pm_ra_cosdec, radial_velocity);
+    }
+}; //base_equatorial_frame
 
-                //!sets the proper motion in Declination
-                void set_pm_dec(double pm_dec)
-                {
-                    this->motion.set_dlat(pm_dec);
-                }
+}}} //namespace boost::astronomy::coordinate
 
-                //!sets the proper motion in Right Ascension including cos(dec)
-                void set_pm_ra_cosdec(double pm_ra_cosdec)
-                {
-                    this->motion.set_dlon_coslat(pm_ra_cosdec);
-                }
-
-                //!sets the radial_velocity
-                void set_radial_velocity(double radial_velocity)
-                {
-                    this->motion.set_ddist(radial_velocity);
-                }
-
-                //!set value of motion including cos(dec)
-                void set_pm_dec_ra_radial(double pm_dec, double pm_ra_cosdec, double radial_velocity)
-                {
-                    this->motion.set_dlat_dlon_coslat_ddist(pm_dec, pm_ra_cosdec, radial_velocity);
-                }
-            };
-
-        } //namespace coordinate
-    } //namespace astronomy
-} //namespace boost
 #endif // !BOOST_ASTRONOMY_COORDINATE_BASE_EQUATORIAL_FRAME_HPP
 
