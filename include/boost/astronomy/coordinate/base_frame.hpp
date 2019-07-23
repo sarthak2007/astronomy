@@ -54,7 +54,7 @@ public:
         return std::make_tuple
         (
             Differential::quantity1::from_value(bg::get<0>(motion.get_differential())),
-            Differential::quantity2::from_value(bg::get<1>(motion.get_differential())),
+            Differential::quantity2::from_value(bg::get<1>(motion.get_differential()))
         );
     }
 
