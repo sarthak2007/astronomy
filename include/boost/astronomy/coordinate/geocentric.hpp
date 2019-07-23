@@ -3,39 +3,55 @@
 
 #include <boost/astronomy/coordinate/base_ecliptic_frame.hpp>
 
-namespace boost
+namespace boost { namespace astronomy { namespace coordinate {
+
+template
+<
+    typename Representation, typename Differential
+>
+struct geocentric : public base_ecliptic_frame<Representation, Differential>
 {
-    namespace astronomy
-    {
-        namespace coordinate
-        {
-            template <typename RepresentationDegreeOrRadian = boost::astronomy::coordinate::degree,
-                typename DifferentailDegreeOrRadian = boost::astronomy::coordinate::degree>
-            struct geocentric : public boost::astronomy::coordinate::base_ecliptic_frame
-                <RepresentationDegreeOrRadian, DifferentailDegreeOrRadian>
-            {
-            public:
-                geocentric() {}
 
-                template <typename Represetation>
-                geocentric(Represetation const& representation_data) : base_ecliptic_frame
-                    <RepresentationDegreeOrRadian, DifferentailDegreeOrRadian>(representation_data) {}
+public:
+    //default constructor no initialization
+    geocentric() {}
 
-                geocentric(double lat, double lon, double distance) : base_ecliptic_frame
-                    <RepresentationDegreeOrRadian, DifferentailDegreeOrRadian>(lat, lon, distance) {}
+    //!constructs object from another representation object
+    template <typename OtherRepresentation>
+    geocentric(OtherRepresentation const& representation_data) : base_ecliptic_frame
+        <Representation, Differential>(representation_data) {}
 
-                geocentric(double lat, double lon, double distance, double pm_lat, double pm_lon_coslat, double radial_velocity) :
-                    base_ecliptic_frame<RepresentationDegreeOrRadian, DifferentailDegreeOrRadian>
-                    (lat, lon, distance, pm_lat, pm_lon_coslat, radial_velocity) {}
+    //!constructs object from provided components of representation
+    geocentric
+    (
+        typename Representation::quantity1 const& lat,
+        typename Representation::quantity2 const& lon,
+        typename Representation::quantity3 const& distance
+    ) : base_ecliptic_frame<Representation, Differential>(lat, lon, distance) {}
 
-                template <typename Representation, typename Differential>
-                geocentric(Representation const& representation_data, Differential const& diff) :
-                    base_ecliptic_frame<RepresentationDegreeOrRadian, DifferentailDegreeOrRadian>
-                    (representation_data, diff) {}
-            };
-        } //namespace coordinate
-    } //namespace astronomy
-} //namespace boost
+    //!constructs object from provided components of representation and differential
+    geocentric
+    (
+        typename Representation::quantity1 const& lat,
+        typename Representation::quantity2 const& lon,
+        typename Representation::quantity3 const& distance,
+        typename Differential::quantity1 const& pm_lat,
+        typename Differential::quantity2 const& pm_lon_coslat,
+        typename Differential::quantity3 const& radial_velocity
+    ) : base_ecliptic_frame<Representation, Differential>
+            (lat, lon, distance, pm_lat, pm_lon_coslat, radial_velocity) {}
+
+    //!constructs object from other representation and differential objects
+    template <typename OtherRepresentation, typename OtherDifferential>
+    geocentric
+    (
+        OtherRepresentation const& representation_data,
+        OtherDifferential const& differential_data
+    ) : base_ecliptic_frame<Representation, Differential>
+            (representation_data, differential_data) {}
+};
+
+}}} //namespace boost::astronomy::coordinate
 
 #endif // !BOOST_ASTRONOMY_COORDINATE_GEOCENTRIC_HPP
 
