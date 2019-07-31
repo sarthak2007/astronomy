@@ -9,7 +9,9 @@
 #include <boost/astronomy/io/primary_hdu.hpp>
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/image_extension.hpp>
+#include <boost/astronomy/io/ascii_table.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
+#include <iostream>
 
 namespace boost
 {
@@ -19,7 +21,7 @@ namespace boost
         {
             struct fits 
             {
-            protected:
+            public:
                 std::fstream fits_file; //!FITS to be processed
                 std::vector<std::shared_ptr<hdu>> hdu_; //!Stores all th HDU in file
 
@@ -30,12 +32,21 @@ namespace boost
                 {
                     fits_file.open(file_path, std::ios_base::in | std::ios_base::binary | mode);
                     read_primary_hdu();
-                    //read_extensions();
+                    std::string line;
+                    while (fits_file) { 
+  
+                        // Read a Line from File 
+                        getline(fits_file, line); 
+                  
+                        // Print line in Console 
+                        std::cout << line << std::endl; 
+                    } 
+                    // read_extensions();
                 }
 
                 void read_primary_hdu()
                 {
-                    hdu_[0] = std::make_shared<hdu>(fits_file);
+                    hdu_.emplace_back(std::make_shared<hdu>(fits_file));
                     
                     switch (hdu_[0]->value_of<int>(std::string("BITPIX")))
                     {
@@ -99,7 +110,7 @@ namespace boost
                         }
                         else if (hdu_.back()->value_of<std::string>("XTENSION") == "'TABLE   '")
                         {
-
+                            hdu_.back() = std::make_shared<ascii_table>(fits_file, *hdu_.back());
                         }
                         
                     }
