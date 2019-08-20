@@ -1,6 +1,8 @@
 foreach(_name
         cartesian_representation
-        cartesian_differential)
+        cartesian_differential
+        spherical_representation
+        spherical_differential)
     set(_target test_coordinate_${_name})
 
     add_executable(${_target} "")
