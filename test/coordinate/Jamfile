@@ -2,3 +2,5 @@ import testing ;
 
 run cartesian_representation.cpp ;
 run cartesian_differential.cpp ;
+run spherical_representation.cpp ;
+run spherical_differential.cpp ;
